@@ -10,6 +10,12 @@ const cheerio = require("cheerio");
 // Initialize Express
 var app = express();
 
+// Set view engine
+app.engine('handlebars', exphbs({
+  defaultLayout: 'main'
+}));
+app.set('view engine', 'handlebars');
+
 // Database configuration
 var databaseUrl = "scraper";
 var collections = ["scrapedData"];
