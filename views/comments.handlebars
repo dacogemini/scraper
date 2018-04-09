@@ -1,0 +1,70 @@
+<div class="container">
+  <div class="header clearfix">
+    <nav>
+      <ul class="nav nav-pills float-right">
+        <li class="nav-item">
+          <a class="nav-link active" href="/">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://www.petapixel.com" target="_blank">Visit PetaPixel</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/hadicodes" target="_blank">Visit my Github</a>
+        </li>
+      </ul>
+    </nav>
+    <h3 class="text-muted">Mongo WebScraping</h3>
+  </div>
+  <hr>
+  {{!--Display the scraped titles, links, and article snippets in this section.--}}
+  <div class="row">
+    <h1><a href="{{result.link}}" target="_blank">{{result.title}}</a></h1>
+    <p>{{result.articleSnippet}}</p>
+  </div>
+  <div class="row">
+    <h2>Comments So Far</h2>
+  </div>
+  {{!--If no comments exist then display the following ptag info--}}
+  <div class="row">
+    {{#unless result.comment}}
+    <p>There are no comments just yet. Add yours below!</p>
+    {{/unless}}
+  </div>
+  {{!--Iterate through the comments by author and their message, display them, and have the option to delete them from the user view (also deletes from our db --}}
+  <div class="row">
+    <ul>
+      {{#each result.comment}}
+      <li style="list-style: none">
+        <h5>Name: {{this.name}} </h5>
+        <p>Message: {{this.body}}</p>
+        <button class="delete-button btn btn-secondary" data-comment="{{this._id}}">Delete Comment</button>
+      </li>
+      {{/each}}
+    </ul>
+    
+  </div>
+  <div class="row">
+    <h2>Say Something About This Article</h2>
+  </div>
+  {{!--Do a post method for the comment(s) a user adds and save it to the db--}}
+  <form method="POST" action="/articles/{{result._id}}">
+    <div class="form-group row">
+      <label for="name" class="col-form-label">Name</label>
+      <input class="form-control" type="text" name="name" id="name" required>
+    </div>
+    <div class="form-group row">
+      <label for="body">Message</label>
+      <textarea class="form-control" id="body" name="body" rows="3" required></textarea>
+    </div>
+    <button class="btn btn-primary" type="submit">Submit</button>
+  </form>
+  <br>
+  <br>
+  <br>
+  <br>
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; Hadi Yousufi 2017</p>
+    </div>
+  </footer>
+</div>

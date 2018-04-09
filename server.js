@@ -4,6 +4,9 @@ const mongojs = require("mongojs");
 const request = require("request");
 const cheerio = require("cheerio");
 
+// Using es6 js promise
+// mongoose.Promise = Promise;
+
 // Initialize Express
 var app = express();
 
@@ -16,7 +19,17 @@ var db = mongojs(databaseUrl, collections);
 db.on("error", function (error) {
   console.log("Database Error:", error);
 });
-
+// =============================================================================
+// ALT HOOK: 
+// before(done => {
+//  mongoose.connect('mongodb://localhost/muber_test');
+//  mongoose.connection
+//   .once('open', () => done())
+//   .on('error', error => {
+//     console.warn('Warning', error);
+//   });
+// });
+// =============================================================================
 // Main route (simple Hello World Message)
 app.get("/", function (req, res) {
   res.send("Welcome to the POST!");
@@ -43,10 +56,10 @@ app.get("/scrape", function (req, res) {
   // Make a request call to grab the HTML body from the site of your choice
   request("https://medium.com/javascript-scene", function (error, response, html) {
 
-    //* Load the HTML into cheerio and save it to a variable
-    //* '$' = shorthand for cheerio's selector command
+    // Load the HTML into cheerio and save it to a variable
+    // '$' = shorthand for cheerio's selector command
     var $ = cheerio.load(html);
-    var results = [];
+    // var results = [];
 
     // Select each element in the HTML body from which you want information.
     // NOTE: Cheerio selectors function similarly to jQuery's selectors,
@@ -55,15 +68,15 @@ app.get("/scrape", function (req, res) {
 
       // var link = $(element).children().attr("href");
       var title = $(element).children().text();
-      var imgLink = $(element).find("a").attr("href");
+      var link = $(element).find("a").attr("href");
 
       // Save these results in an object that we'll push into the results array we defined earlier
 
-      if (title && imgLink) {
+      if (title && link) {
 
         db.scrappedData.insert({
             title: title,
-            link: imgLink
+            link: link
           },
           function (err, inserted) {
             if (err) {
@@ -81,9 +94,6 @@ app.get("/scrape", function (req, res) {
 
     });
   });
-
-  // Send a "Scrape Complete" message to the browser
-  res.send("Scrape Complete");
 });
 
 
