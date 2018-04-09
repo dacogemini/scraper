@@ -1,49 +1,93 @@
 // Dependencies
 const express = require("express");
-const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
-
-// global promise
-mongoose.Promise = global.Promise;
-
-// Scraping tools
-var request = require("request");
-var cheerio = require("cheerio");
-
-var PORT = process.env.PORT || 8080;
+const mongojs = require("mongojs");
+const request = require("request");
+const cheerio = require("cheerio");
 
 // Initialize Express
 var app = express();
 
-// Serve static content
-app.use(express.static("public"));
+// Database configuration
+var databaseUrl = "scraper";
+var collections = ["scrapedData"];
 
-// Handlebars
-var exphbs = require("express-handlebars");
-// Set Handlebars as default view engine
-app.engine("handlebars", exphbs({
-    defaultLayout: "main"
-}));
-app.set("view engine", "handlebars");
-
-// Import routes and give the server access to them.
-var routes = require("./controllers/scraper_controller.js");
-
-app.use("/", routes);
-mongoose.connect();
-var db = mongoose.connection;
-
-// Show any mongoose errors
-db.on("error", function(error) {
-  console.log("Mongoose Error: ", error);
+// Hook mongojs configuration to the db variable
+var db = mongojs(databaseUrl, collections);
+db.on("error", function (error) {
+  console.log("Database Error:", error);
 });
 
-// logging into mongoosedb
-db.once("open", function() {
-  console.log("Mongoose connection successful.");
+// Main route (simple Hello World Message)
+app.get("/", function (req, res) {
+  res.send("Welcome to the POST!");
 });
 
-// Listen on port 8080
-app.listen(PORT, function () {
-    console.log("App running on PORT " + PORT);
+// Retrieve data from the db
+app.get("/all", function (req, res) {
+  // Find all results from the scrapedData collection in the db
+  db.scrapedData.find({}, function (error, found) {
+    // Throw any errors to the console
+    if (error) {
+      console.log(error);
+    }
+    // If there are no errors, send the data to the browser as json
+    else {
+      res.json(found);
+    }
+  });
+});
+
+// Scrape data from one site and place it into the mongodb db
+app.get("/scrape", function (req, res) {
+
+  // Make a request call to grab the HTML body from the site of your choice
+  request("https://medium.com/javascript-scene", function (error, response, html) {
+
+    //* Load the HTML into cheerio and save it to a variable
+    //* '$' = shorthand for cheerio's selector command
+    var $ = cheerio.load(html);
+    var results = [];
+
+    // Select each element in the HTML body from which you want information.
+    // NOTE: Cheerio selectors function similarly to jQuery's selectors,
+    // but be sure to visit the package's npm page to see how it works
+    $("div.row").each(function (i, element, ) {
+
+      // var link = $(element).children().attr("href");
+      var title = $(element).children().text();
+      var imgLink = $(element).find("a").attr("href");
+
+      // Save these results in an object that we'll push into the results array we defined earlier
+
+      if (title && imgLink) {
+
+        db.scrappedData.insert({
+            title: title,
+            link: imgLink
+          },
+          function (err, inserted) {
+            if (err) {
+              // Log the error if one is encountered during the query
+              console.log(err);
+            } else {
+              // Otherwise, log the inserted data
+              console.log(inserted);
+            }
+          });
+      };
+
+      // Send a "Scrape Complete" message to the browser
+      res.send("Scrape Complete");
+
+    });
+  });
+
+  // Send a "Scrape Complete" message to the browser
+  res.send("Scrape Complete");
+});
+
+
+// Listen on port 3000
+app.listen(4000, function () {
+  console.log("App running on port 4000!");
 });
