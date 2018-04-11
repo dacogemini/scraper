@@ -17,7 +17,15 @@ var PORT = 3000;
 // Initialize Express
 var app = express();
 
-// Configure middleware
+// Handlebars
+var exphbs = require("express-handlebars");
+
+app.engine("handlebars", exphbs({ defaultLayout: "main" }));
+app.set("view engine", "handlebars");
+
+// =============================================================================
+//* MIDDLEWARE
+// =============================================================================
 
 // Use morgan logger for logging requests
 app.use(logger("dev"));
@@ -29,35 +37,45 @@ app.use(express.static("public"));
 // Connect to the Mongo DB
 mongoose.connect("mongodb://localhost/mongooseScraper");
 
-// Routes
+// =============================================================================
+//* ROUTES
+// =============================================================================
 
-// A GET route for scraping the echoJS website
+app.get("/", function(req, res) {
+
+  // Grab every document in the Articles collection
+  db.Article.find({})
+    .then(function(dbArticle) {
+      
+    // If we were able to successfully find Articles, send them back to the client
+    // res.json(dbArticle);
+     var articleData = {
+       data: dbArticle
+     }
+     console.log('Article Data ' + articleData.data);
+     res.render('index', articleData);
+    })
+    .catch(function(err) {
+      // If an error occurred, send it to the client
+      res.json(err);
+    });
+});
+
+// A GET route for scraping the informit website
 app.get("/scrape", function(req, res) {
-  // First, we grab the body of the html with request
+  //* First, we grab the body of the html with request
   axios.get("https://www.informit.com/articles/index.aspx?st=60206").then(function(response) {
-    // Then, we load that into cheerio and save it to $ for a shorthand selector
+
+    //* Then, we load that into cheerio and save it to $ (a shorthand selector)
     var $ = cheerio.load(response.data);
 
     $("a.title").each((i, element) => {
       // var link = $(element).children().attr("href");
       var title = $(element).text();
-      var link = $(element).attr("href");
+      var link = 'http://informit.com' + $(element).attr("href");
       console.log(title);
       console.log(link);
-/*
-    // Now, we grab every h2 within an article tag, and do the following:
-    $("article h2").each(function(i, element) {
-      // Save an empty result object
-      var result = {};
 
-      // Add the text and href of every link, and save them as properties of the result object
-      result.title = $(this)
-        .children("a")
-        .text();
-      result.link = $(this)
-        .children("a")
-        .attr("href");
-*/
       // Create a new Article using the `result` object built from scraping
       db.Article.create({
         title: title,
@@ -74,15 +92,21 @@ app.get("/scrape", function(req, res) {
     });
 
     // If we were able to successfully scrape and save an Article, send a message to the client
-    res.send("Scrape Complete");
+    res.send("Scrape Complete"); //! << Success
   });
 });
 
+// =============================================================================
+//* GET ROUTES FROM DATABASE
+// =============================================================================
+
 // Route for getting all Articles from the db
 app.get("/articles", function(req, res) {
+
   // Grab every document in the Articles collection
   db.Article.find({})
     .then(function(dbArticle) {
+      
       // If we were able to successfully find Articles, send them back to the client
       res.json(dbArticle);
     })
