@@ -1,30 +1,31 @@
 <div class="container">
     <div class="header clearfix">
-        <nav>
+        <br>
+        <h3 class="text-muted">MONGO WEB-SCRAPER</h3>
+    </div>
+
+    <div class="jumbotron" style="background-color: purple; width: auto; height: 200px" >
+         <nav>
             <ul class="nav nav-pills float-right">
                 <li class="nav-item">
-                    <a class="nav-link active" href="/">Home <span class="sr-only">(current)</span></a>
+        <p><a class="btn btn-lg btn-success" href="/scrape" role="button">SCRAPE !</a></p>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="https://www.petapixel.com" target="_blank">Visit PetaPixel</a>
+                    <a class="nav-link" href="http://www.informit.com/" style="color: white" target="_blank">Visit Informit</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="https://github.com/hadicodes" target="_blank">Visit my Github</a>
+                    <a class="nav-link" href="https://github.com/dacogemini" target="_blank" style="color: white">Visit my Github Page!</a>
                 </li>
             </ul>
         </nav>
-        <h3 class="text-muted">Mongo WebScraping</h3>
-    </div>
-
-    <div class="jumbotron">
-        <h1 class="jumboheader">PetaPixel Scraper</h1>
-        <p class="lead">Scrape the leading Photography enthusiast website for exiting articles</p>
-        <p><a class="btn btn-lg btn-success" href="/scrape" role="button">Fetch the latest !</a></p>
+        <h1 class="jumboheader" style="color: white; margin-top: -20px">Geek Scraper</h1>
+         <img style="width: 8em" src="https://lh3.googleusercontent.com/fWMD9E-My6Lcta062mKWRdxeUQdNwd8myiulbp1Z4zP7nYfP1PpoPUQCQUA4JLWmkdtytSR_yKg1JT2QVlhfDeuCNTxuANkCyZjY71VCYv1pIe3S1hhuZB8jpNK5Gdprpl6jE71KdQ=w2400"
+        alt="">
     </div>
 
     {{!--News Cards--}} {{!--Iterate through the results and populate the handlebars injection points with the scraped titles,
-    links, and article snippets.--}} {{#each result}}
-    <div class="card news-section">
+    links, and article snippets.--}} {{#each data}}
+    <div class="card news-section" style="margin-top: 50px">
         <a href="{{this.link}}">
             <h4 class="card-header">{{this.title}}</h4>
         </a>
@@ -45,7 +46,7 @@
 
 
     <footer class="footer">
-        <p>&copy; Hadi Yousufi 2017</p>
+        <p>&copy; Dan Collins 2018</p>
     </footer>
 
 </div>
