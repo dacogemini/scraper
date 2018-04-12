@@ -46,13 +46,14 @@ app.get("/", function(req, res) {
   // Grab every document in the Articles collection
   db.Article.find({})
     .then(function(dbArticle) {
-      
+    //  console.log(dbArticle);
     // If we were able to successfully find Articles, send them back to the client
     // res.json(dbArticle);
      var articleData = {
        data: dbArticle
      }
-     console.log('Article Data ' + articleData.data);
+   //  console.log('Article Data ' + articleData.data);
+
      res.render('index', articleData);
     })
     .catch(function(err) {
@@ -69,21 +70,24 @@ app.get("/scrape", function(req, res) {
     //* Then, we load that into cheerio and save it to $ (a shorthand selector)
     var $ = cheerio.load(response.data);
 
-    $("a.title").each((i, element) => {
+    $("dl").each((i, element) => {
       // var link = $(element).children().attr("href");
-      var title = $(element).text();
-      var link = 'http://informit.com' + $(element).attr("href");
-      console.log(title);
-      console.log(link);
+      var title = $(element).children("dt").children("a").text();
+      var link = $(element).children("dt").children("a").attr('href');
+      var summary = $(element).children('.intro').text();
+      console.log(summary);
+    // console.log(title);
+     // console.log(link);
 
       // Create a new Article using the `result` object built from scraping
       db.Article.create({
         title: title,
-        link: link
+        link: link,
+        summary: summary
       })
         .then(function(dbArticle) {
           // View the added result in the console
-          console.log(dbArticle);
+        //  console.log(dbArticle);
         })
         .catch(function(err) {
           // If an error occurred, send it to the client
@@ -92,7 +96,8 @@ app.get("/scrape", function(req, res) {
     });
 
     // If we were able to successfully scrape and save an Article, send a message to the client
-    res.send("Scrape Complete"); //! << Success
+  // res.send("Scrape Complete"); // << Success
+    res.redirect("/");
   });
 });
 

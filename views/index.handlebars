@@ -26,16 +26,16 @@
     {{!--News Cards--}} {{!--Iterate through the results and populate the handlebars injection points with the scraped titles,
     links, and article snippets.--}} {{#each data}}
     <div class="card news-section" style="margin-top: 50px">
-        <a href="{{this.link}}">
-            <h4 class="card-header">{{this.title}}</h4>
+        <a href="{{link}}">
+            <h4 class="card-header">{{title}}</h4>
         </a>
         <div class="card-block">
             {{!--
             <h4 class="card-title"></h4>
             </a>--}}
-            <a href="{{this.link}}">
-                <p class="card-text">{{this.articleSnippet}}</p>
-            </a>
+
+                <p class="card-text">{{summary}}</p>
+
             <br>
             <a href="/articles/{{this._id}}" class="btn btn-primary">Comment</a>
         </div>
